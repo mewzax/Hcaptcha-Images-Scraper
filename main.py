@@ -9,18 +9,17 @@ class HcaptchaImagesDownloader:
     def __init__(self, host, sitekey):
         self.host = host
         self.sitekey = sitekey
-        self.counter = 0
+        self.counter = 1
 
     def download_images(self, path):
         self.c = c(self.host, self.sitekey)
         self.c["type"] = "hsl"
 
         self.res = self.get_captcha()
-
         
         for captcha in self.res["tasklist"]:
             url = captcha['datapoint_uri']
-            print(url)
+            print(f"Image {self.counter} [{url[:40]}...]")
             res = requests.get(url, stream = True)
             with open(path + "/" + "image_" +str(self.counter) + ".png", 'wb') as f:
                 for chunk in res.iter_content(chunk_size=1024):

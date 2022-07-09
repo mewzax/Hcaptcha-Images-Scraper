@@ -6,7 +6,7 @@ import datetime
 
 
 def n(req):
-    # thank's Honde for the following code
+    # thank's h0nde for the following code
     x = "0123456789/:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     req = req.split(".")
