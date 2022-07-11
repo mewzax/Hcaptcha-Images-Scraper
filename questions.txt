@@ -1,0 +1,11 @@
+airplane in the sky flying left
+airplane
+bicycle
+boat
+bus
+motorbus
+motorcycle
+seaplane
+train
+truck
+vertical river
