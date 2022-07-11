@@ -1,32 +1,52 @@
+import os
+import cv2
+import numpy as np
 import json
 import urllib
 import requests
+import tkinter as tk
+from PIL import ImageTk, Image
 
 from data.n import n
 from data.c import c
+
 
 class HcaptchaImagesDownloader:
     def __init__(self, host, sitekey):
         self.host = host
         self.sitekey = sitekey
         self.counter = 1
+        self.directory = os.getcwd()
+        self.questions = self.get_questions()
 
-    def download_images(self, path):
+    def download_images(self):
         self.c = c(self.host, self.sitekey)
-        self.c["type"] = "hsl"
+        self.c['type'] = 'hsl'
 
         self.res = self.get_captcha()
-        
-        for captcha in self.res["tasklist"]:
-            url = captcha['datapoint_uri']
-            print(f"Image {self.counter} [{url[:40]}...]")
-            res = requests.get(url, stream = True)
-            with open(path + "/" + "image_" +str(self.counter) + ".png", 'wb') as f:
-                for chunk in res.iter_content(chunk_size=1024):
-                    if chunk:
-                        f.write(chunk)
-            self.counter += 1
 
+        question = self.res['requester_question']['en'].replace(
+            'Please click each image containing a ', '').replace('Please click each image containing an ', '')
+
+        if question not in self.questions:
+            self.questions.append(question)
+            self.write_question(question)
+
+        urls = []
+
+        urls.extend(self.res['requester_question_example'])
+
+        for captcha in self.res['tasklist']:
+            url = captcha['datapoint_uri']
+            urls.append(url)
+
+        for url in urls:
+            print(f'Image {self.counter} [{url[:40]}...]')
+            res = requests.get(url, stream=True).raw
+            image = np.asarray(bytearray(res.read()), dtype='uint8')
+            image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+            image = cv2.resize(image, (128, 128))
+            self.panel(image)
 
     def get_captcha(self):
         data = {
@@ -57,8 +77,52 @@ class HcaptchaImagesDownloader:
 
         }, timeout=4).json()
 
+    def panel(self, img):
+        root = tk.Tk()
+        root.title('hCaptcha')
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+        window_width = 500
+        window_height = 500
+        x_coordinate = int((screen_width / 2) - (window_width / 2))
+        y_coordinate = int((screen_height / 2) - (window_height / 2))
+        root.geometry(str(window_width) + 'x' + str(window_width) +
+                      '+' + str(x_coordinate) + '+' + str(y_coordinate))
+        root.resizable(False, False)
+        for button in self.questions:
+            tk.Button(root, text=button, command=lambda button=button: [
+                      self.save_image(button, img), root.destroy()]).pack()
 
-if __name__ == "__main__":
-    capdl = HcaptchaImagesDownloader( "discord.com", "4c672d35-0701-42b2-88c3-78380b0db560")
+        image = ImageTk.PhotoImage(image=Image.fromarray(img))
+        tk.Label(root, image=image).pack()
+        root.mainloop()
+
+    def save_image(self, button, image):
+        folder = os.path.join(self.directory, 'images', button)
+        if not os.path.isdir(folder):
+            os.mkdir(folder)
+
+        cv2.imwrite(os.path.join(folder, 'image_' +
+                    str(self.counter) + '.png'), image)
+        self.counter += 1
+
+    def get_questions(self):
+        with open('questions.txt', 'r') as f:
+            return f.read().splitlines()
+
+    def write_question(self, question):
+        question += '\n'
+        with open('questions.txt', 'a+') as f:
+            f.seek(0)
+
+            if question in f.read().splitlines():
+                return
+
+            f.write(question)
+
+
+if __name__ == '__main__':
+    capdl = HcaptchaImagesDownloader(
+        'discord.com', '4c672d35-0701-42b2-88c3-78380b0db560')
     while True:
-        capdl.download_images("./images")
+        capdl.download_images()
