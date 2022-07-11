@@ -36,3 +36,13 @@ python3 main.py
 ## Credits:
 - Thank's to h0nde for n data function
 - Thank's to MaxAndolini for GUI
+
+---
+
+<p align="center"> 
+  <b>Informations</b><br>
+  <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/Mewzax/Hcaptcha-Images-Scraper">
+  <a href="https://github.com/Mewzax/Hcaptcha-Images-Scraper"><img src="https://img.shields.io/github/last-commit/Mewzax/Hcaptcha-Images-Scraper?style=flat" /></a>
+  <a href="https://github.com/Mewzax/Hcaptcha-Images-Scraper/stargazers"><img src="https://img.shields.io/github/stars/Mewzax/Hcaptcha-Images-Scraper?style=flat" /></a>
+  <a href="https://github.com/Mewzax/Hcaptcha-Images-Scraper/"><img src="https://visitor-badge.laobi.icu/badge?page_id=Mewzax.Hcaptcha-Images-Scraper" /></a>
+</p>
