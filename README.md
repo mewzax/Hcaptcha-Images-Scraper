@@ -18,9 +18,11 @@
 # Clone the repo:
 git clone https://github.com/Mewzax/Hcaptcha-Images-Scraper.git
 cd Hcaptcha-Images-Scraper
+
 ## Download dependencies
 pip install opencv-python
 pip install requests
+
 # Run the code
 python3 main.py
 ```
