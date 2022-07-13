@@ -36,6 +36,13 @@ python3 main.py
 - Thank's to h0nde for n data function
 - Thank's to MaxAndolini for GUI
 
+
+## Changelogs:
+```diff
+2022-07-13
++ domestic cat category
+```
+
 ---
 
 <p align="center"> 
