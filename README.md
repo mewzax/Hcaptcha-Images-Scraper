@@ -6,7 +6,7 @@
 <a href="https://github.com/Mewzax/Hcaptcha-Images-Scraper/stargazers"><img src="https://img.shields.io/github/stars/Mewzax/Hcaptcha-Images-Scraper?style=flat" /></a>
 <a href="https://github.com/Mewzax/Hcaptcha-Images-Scraper/"><img src="https://visitor-badge.laobi.icu/badge?page_id=Mewzax.Hcaptcha-Images-Scraper" /></a>
 
-> Developped by [Mewzax](https://github.com/Mewzax), GUI by [MaxAndolini](https://github.com/MaxAndolini/hCaptcha-Images)
+> Developped by [Mewzax](https://github.com/Mewzax), GUI by [MaxAndolini](https://github.com/MaxAndolini/hCaptcha-Images), updated by [Vast](https://github.com/imvast)
 <img src="https://user-images.githubusercontent.com/75091300/178242326-96c802fe-884c-45e2-95fd-b75c83026e19.png" height="600px" width="600px">
 
 ## Features:
