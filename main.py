@@ -18,6 +18,7 @@ class HcaptchaImagesDownloader:
         self.counter = 1
         self.directory = os.getcwd()
         self.questions = self.get_questions()
+        self.currentquestion = None
 
     def download_images(self):
         self.c = c(self.host, self.sitekey)
@@ -28,6 +29,8 @@ class HcaptchaImagesDownloader:
         question = self.res['requester_question']['en'].replace(
             'Please click each image containing a ', '').replace('Please click each image containing an ', '')
 
+        self.currentquestion = question
+        
         if question not in self.questions:
             self.questions.append(question)
             self.write_question(question)
@@ -41,7 +44,7 @@ class HcaptchaImagesDownloader:
             urls.append(url)
 
         for url in urls:
-            print(f'Image {self.counter} [{url[:40]}...]')
+            print(f'Image {self.counter} [{url[:40].replace("https://", "")}...] | Q: {question}')
             res = requests.get(url, stream=True).raw
             image = np.asarray(bytearray(res.read()), dtype='uint8')
             image = cv2.imdecode(image, cv2.IMREAD_COLOR)
@@ -82,19 +85,30 @@ class HcaptchaImagesDownloader:
         root.title('hCaptcha')
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
-        window_width = 500
-        window_height = 500
+        window_width = 800
+        window_height = 800
+        
         x_coordinate = int((screen_width / 2) - (window_width / 2))
         y_coordinate = int((screen_height / 2) - (window_height / 2))
-        root.geometry(str(window_width) + 'x' + str(window_width) +
+        root.geometry(str(window_height) + 'x' + str(window_width) +
                       '+' + str(x_coordinate) + '+' + str(y_coordinate))
         root.resizable(False, False)
-        for button in self.questions:
-            tk.Button(root, text=button, command=lambda button=button: [
-                      self.save_image(button, img), root.destroy()]).pack()
-
+        
         image = ImageTk.PhotoImage(image=Image.fromarray(img))
-        tk.Label(root, image=image).pack()
+        tk.Label(root, image=image).place(relx = 0.95, rely = 0.5, anchor = tk.E)
+        
+        tk.Button(root, text="N/A", command = root.destroy).place(relx = 1, rely = 0, anchor = tk.NE)
+        
+        xrow = 0
+        for button in self.questions:
+            if button == self.currentquestion:
+                tk.Button(root, text=button, command=lambda button=button: [
+                      self.save_image(button, img), root.destroy()]).place(relx = 0.95, rely = 0.6, anchor = tk.E)
+            else:
+                tk.Button(root, text=button, command=lambda button=button: [
+                      self.save_image(button, img), root.destroy()]).grid(row=xrow,column=0,padx=15)
+                xrow += 1
+
         root.mainloop()
 
     def save_image(self, button, image):
