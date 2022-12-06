@@ -106,7 +106,6 @@ class HcaptchaImagesDownloader:
         # load images with light and dark mode image
         image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_images")
         logo_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "CustomTkinter_logo_single.png")), size=(26, 26))
-        image_icon_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "image_icon_light.png")), size=(20, 20))
         home_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "home_dark.png")),
                                                  dark_image=Image.open(os.path.join(image_path, "home_light.png")), size=(20, 20))
         add_user_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "add_user_dark.png")),
@@ -120,15 +119,15 @@ class HcaptchaImagesDownloader:
                                                              compound="left", font=customtkinter.CTkFont(size=15, weight="bold"))
         navigation_frame_label.grid(row=0, column=0, padx=20, pady=20)
         
-        home_button = customtkinter.CTkButton(navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Home",
+        self.root.home_button = customtkinter.CTkButton(navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Home",
                                                    fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
                                                    image=home_image, anchor="w", command=self.home_button_event)
-        home_button.grid(row=1, column=0, sticky="ew")
+        self.root.home_button.grid(row=1, column=0, sticky="ew")
 
-        devframe_button = customtkinter.CTkButton(navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Authors",
+        self.root.devframe_button = customtkinter.CTkButton(navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Authors",
                                                       fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
                                                       image=add_user_image, anchor="w", command=self.devframe_button_event)
-        devframe_button.grid(row=2, column=0, sticky="ew")
+        self.root.devframe_button.grid(row=2, column=0, sticky="ew")
 
         exit_button = customtkinter.CTkButton(navigation_frame, text="EXIT", command = self.root.quit)
         exit_button.grid(row=5, column=0, sticky="ew")
@@ -140,53 +139,58 @@ class HcaptchaImagesDownloader:
 
 
         # create home frame
-        home_frame = customtkinter.CTkFrame(self.root, corner_radius=0, fg_color="transparent")
-        home_frame.grid_columnconfigure(0, weight=1)
+        self.root.home_frame = customtkinter.CTkFrame(self.root, corner_radius=0, fg_color="transparent")
+        self.root.home_frame.grid_columnconfigure(0, weight=1)
 
 
         image = customtkinter.CTkImage(Image.fromarray(img), size=(150, 150))
         
-        customtkinter.CTkLabel(home_frame, text="", image=image).place(relx = 0.95, rely = 0.5, anchor = "e")
+        customtkinter.CTkLabel(self.root.home_frame, text="", image=image).place(relx = 0.95, rely = 0.5, anchor = "e")
     
-        customtkinter.CTkButton(home_frame, text="N/A", command = lambda:self.root.destroy()).place(relx = 1, rely = 0, anchor = "ne")
+        customtkinter.CTkButton(self.root.home_frame, text="N/A", command = lambda:self.root.destroy()).place(relx = 1, rely = 0, anchor = "ne")
         
 
         xrow = 0
         for button in self.questions:
             if button == self.currentquestion:
-                customtkinter.CTkButton(home_frame, text=button, command=lambda button=button: [
+                customtkinter.CTkButton(self.root.home_frame, text=button, command=lambda button=button: [
                         self.save_image(button, img), self.root.destroy()]).place(relx = 0.95, rely = 0.6, anchor = "e")
             else:
-                customtkinter.CTkButton(home_frame, text=button, command=lambda button=button: [
+                customtkinter.CTkButton(self.root.home_frame, text=button, command=lambda button=button: [
                         self.save_image(button, img), self.root.destroy()]).grid(sticky="W", row=xrow,column=0,padx=10,pady=0.5)
                 xrow += 1
 
 
 
         # create second frame
-        second_frame = customtkinter.CTkFrame(self.root, corner_radius=0, fg_color="transparent")
-        second_frame_label = customtkinter.CTkLabel(second_frame, text="Authors", font=customtkinter.CTkFont(size=15, weight="bold"))
-        second_frame_label.grid(row=0, column=0, padx=20, pady=20)
+        self.root.second_frame = customtkinter.CTkFrame(self.root, corner_radius=0, fg_color="transparent")
+        self.root.second_frame.grid_columnconfigure(0, weight=1)
+        
+        second_frame_label = customtkinter.CTkLabel(self.root.second_frame, text="Authors", font=customtkinter.CTkFont(size=30, weight="bold"))
+        second_frame_label.grid(row=0, column=0, padx=20, pady=10)
+        
+        author1_label = customtkinter.CTkLabel(self.root.second_frame, text="\n\nMewzax\n- Main Developer\n\n\n\nVast\n- Modern GUI\n- Maintained Datasets\n\n\n\nMaxAndolini\n- Orginal/Base GUI", font=customtkinter.CTkFont(family="Courier", size=15, weight="bold"))
+        author1_label.grid(row=5, column=0, padx=20, pady=25)
 
         # select default frame
-        self.select_frame_by_name(home_button, devframe_button, home_frame, second_frame, "home")
+        self.select_frame_by_name("home")
         
         
         self.root.mainloop()
           
                 
 
-    def select_frame_by_name(self, home_button=None, devframe_button=None, home_frame=None, second_frame=None, name="home"):
+    def select_frame_by_name(self, name="home"):
         # set button color for selected button
-        home_button.configure(fg_color=("gray75", "gray25") if name == "home" else "transparent")
-        devframe_button.configure(fg_color=("gray75", "gray25") if name == "devframe" else "transparent")
+        self.root.home_button.configure(fg_color=("gray75", "gray25") if name == "home" else "transparent")
+        self.root.devframe_button.configure(fg_color=("gray75", "gray25") if name == "devframe" else "transparent")
         
         # show selected frame
-        if name == "home": home_frame.grid(row=0, column=1, sticky="nsew")
-        else: home_frame.grid_forget()
+        if name == "home": self.root.home_frame.grid(row=0, column=1, sticky="nsew")
+        else: self.root.home_frame.grid_forget()
         
-        if name == "devframe": second_frame.grid(row=0, column=1, sticky="nsew")
-        else: second_frame.grid_forget()
+        if name == "devframe": self.root.second_frame.grid(row=0, column=1, sticky="nsew")
+        else: self.root.second_frame.grid_forget()
 
     def home_button_event(self): self.select_frame_by_name("home")
     def devframe_button_event(self): self.select_frame_by_name("devframe")

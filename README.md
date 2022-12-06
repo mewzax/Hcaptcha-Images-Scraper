@@ -49,6 +49,11 @@ python3 main.py
 2022-10-1
 + more images / updated folders for questions
 + added requirements *(update for easier setup)
+
+2022-12-5
++ modernized gui
++ updated questions
++ updated dataset
 ```
 
 ---
