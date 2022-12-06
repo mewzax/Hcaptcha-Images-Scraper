@@ -4,8 +4,9 @@ import numpy as np
 import json
 import urllib
 import requests
-import tkinter as tk
-from PIL import ImageTk, Image
+import customtkinter
+from tkinter import *
+from PIL import Image
 
 from data.n import n
 from data.c import c
@@ -27,7 +28,7 @@ class HcaptchaImagesDownloader:
         self.res = self.get_captcha()
 
         question = self.res['requester_question']['en'].replace(
-            'Please click each image containing a ', '').replace('Please click each image containing an ', '')
+            'Please click each image containing a ', '').replace('Please click each image containing an ', '').replace('Please click each image containing ', '')
 
         self.currentquestion = question
         
@@ -80,36 +81,117 @@ class HcaptchaImagesDownloader:
 
         }, timeout=4).json()
 
+
     def panel(self, img):
-        root = tk.Tk()
-        root.title('hCaptcha')
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
-        window_width = 800
-        window_height = 800
+        customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
         
+        self.root = customtkinter.CTk()
+        
+        self.root.title('hCaptcha')
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        window_width = 950
+        window_height = 800
+    
         x_coordinate = int((screen_width / 2) - (window_width / 2))
         y_coordinate = int((screen_height / 2) - (window_height / 2))
-        root.geometry(str(window_height) + 'x' + str(window_width) +
-                      '+' + str(x_coordinate) + '+' + str(y_coordinate))
-        root.resizable(False, False)
+        self.root.geometry(str(window_height) + 'x' + str(window_width) +
+                        '+' + str(x_coordinate) + '+' + str(y_coordinate))
+        # self.root.resizable(False, False)
+
+        # set grid layout 1x2
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(1, weight=1)
+
+        # load images with light and dark mode image
+        image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_images")
+        logo_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "CustomTkinter_logo_single.png")), size=(26, 26))
+        image_icon_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "image_icon_light.png")), size=(20, 20))
+        home_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "home_dark.png")),
+                                                 dark_image=Image.open(os.path.join(image_path, "home_light.png")), size=(20, 20))
+        add_user_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "add_user_dark.png")),
+                                                     dark_image=Image.open(os.path.join(image_path, "add_user_light.png")), size=(20, 20))
+
+        # create navigation frame
+        navigation_frame = customtkinter.CTkFrame(self.root, corner_radius=0)
+        navigation_frame.grid(row=0, column=0, sticky="nsew")
+        navigation_frame.grid_rowconfigure(4, weight=1)
+        navigation_frame_label = customtkinter.CTkLabel(navigation_frame, text="  hCap Img Scraper", image=logo_image,
+                                                             compound="left", font=customtkinter.CTkFont(size=15, weight="bold"))
+        navigation_frame_label.grid(row=0, column=0, padx=20, pady=20)
         
-        image = ImageTk.PhotoImage(image=Image.fromarray(img))
-        tk.Label(root, image=image).place(relx = 0.95, rely = 0.5, anchor = tk.E)
+        home_button = customtkinter.CTkButton(navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Home",
+                                                   fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+                                                   image=home_image, anchor="w", command=self.home_button_event)
+        home_button.grid(row=1, column=0, sticky="ew")
+
+        devframe_button = customtkinter.CTkButton(navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Authors",
+                                                      fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+                                                      image=add_user_image, anchor="w", command=self.devframe_button_event)
+        devframe_button.grid(row=2, column=0, sticky="ew")
+
+        exit_button = customtkinter.CTkButton(navigation_frame, text="EXIT", command = self.root.quit)
+        exit_button.grid(row=5, column=0, sticky="ew")
+
+        appearance_mode_menu = customtkinter.CTkOptionMenu(navigation_frame, values=["Light", "Dark", "System"],
+                                                                command=self.change_appearance_mode_event)
+        appearance_mode_menu.grid(row=6, column=0, padx=20, pady=20, sticky="s")
+
+
+
+        # create home frame
+        home_frame = customtkinter.CTkFrame(self.root, corner_radius=0, fg_color="transparent")
+        home_frame.grid_columnconfigure(0, weight=1)
+
+
+        image = customtkinter.CTkImage(Image.fromarray(img), size=(150, 150))
         
-        tk.Button(root, text="N/A", command = root.destroy).place(relx = 1, rely = 0, anchor = tk.NE)
+        customtkinter.CTkLabel(home_frame, text="", image=image).place(relx = 0.95, rely = 0.5, anchor = "e")
+    
+        customtkinter.CTkButton(home_frame, text="N/A", command = lambda:self.root.destroy()).place(relx = 1, rely = 0, anchor = "ne")
         
+
         xrow = 0
         for button in self.questions:
             if button == self.currentquestion:
-                tk.Button(root, text=button, command=lambda button=button: [
-                      self.save_image(button, img), root.destroy()]).place(relx = 0.95, rely = 0.6, anchor = tk.E)
+                customtkinter.CTkButton(home_frame, text=button, command=lambda button=button: [
+                        self.save_image(button, img), self.root.destroy()]).place(relx = 0.95, rely = 0.6, anchor = "e")
             else:
-                tk.Button(root, text=button, command=lambda button=button: [
-                      self.save_image(button, img), root.destroy()]).grid(row=xrow,column=0,padx=15)
+                customtkinter.CTkButton(home_frame, text=button, command=lambda button=button: [
+                        self.save_image(button, img), self.root.destroy()]).grid(sticky="W", row=xrow,column=0,padx=10,pady=0.5)
                 xrow += 1
 
-        root.mainloop()
+
+
+        # create second frame
+        second_frame = customtkinter.CTkFrame(self.root, corner_radius=0, fg_color="transparent")
+        second_frame_label = customtkinter.CTkLabel(second_frame, text="Authors", font=customtkinter.CTkFont(size=15, weight="bold"))
+        second_frame_label.grid(row=0, column=0, padx=20, pady=20)
+
+        # select default frame
+        self.select_frame_by_name(home_button, devframe_button, home_frame, second_frame, "home")
+        
+        
+        self.root.mainloop()
+          
+                
+
+    def select_frame_by_name(self, home_button=None, devframe_button=None, home_frame=None, second_frame=None, name="home"):
+        # set button color for selected button
+        home_button.configure(fg_color=("gray75", "gray25") if name == "home" else "transparent")
+        devframe_button.configure(fg_color=("gray75", "gray25") if name == "devframe" else "transparent")
+        
+        # show selected frame
+        if name == "home": home_frame.grid(row=0, column=1, sticky="nsew")
+        else: home_frame.grid_forget()
+        
+        if name == "devframe": second_frame.grid(row=0, column=1, sticky="nsew")
+        else: second_frame.grid_forget()
+
+    def home_button_event(self): self.select_frame_by_name("home")
+    def devframe_button_event(self): self.select_frame_by_name("devframe")
+    def change_appearance_mode_event(self, new_appearance_mode): customtkinter.set_appearance_mode(new_appearance_mode)
+
 
     def save_image(self, button, image):
         folder = os.path.join(self.directory, 'images', button)
