@@ -54,6 +54,14 @@ python3 main.py
 + modernized gui
 + updated questions
 + updated dataset
+
+2022-12-8
++ improved ui
+^ (now has ignore options for better model detection & outdated questions in dropdown box still accessible but away from new questions)
++ updated questions
++ couple bug fixes
++ lil code optimizations
+^ (more soon as needed)
 ```
 
 ---
